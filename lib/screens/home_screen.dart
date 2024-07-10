@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lesson74_yandexmap/services/location_service.dart';
 import 'package:lesson74_yandexmap/services/yandex_map_service.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
+
+import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
+import 'package:google_places_autocomplete_text_field/model/prediction.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isPolyninesTap = false;
   bool isTapPlace = false;
   bool isNightMode = false;
+  Point? selectedLocation;
 
   late YandexMapController mapController;
 
@@ -61,6 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {});
   }
+
+  final _yourGoogleAPIKey = 'AIzaSyBEjfX9jrWudgRcWl2scld4R7s0LtlaQmQ';
+  final _textController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +120,62 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               if (isPolyninesTap) ...?polylines,
             ],
+          ),
+          Positioned(
+            child: Form(
+              key: _formKey,
+              autovalidateMode: _autovalidateMode,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
+                child: GooglePlacesAutoCompleteTextFormField(
+                  textEditingController: _textController,
+                  googleAPIKey: _yourGoogleAPIKey,
+                  decoration: const InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    hintText: 'Enter your address',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(50),
+                      ),
+                    ),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  },
+                  maxLines: 1,
+                  overlayContainer: (child) => Material(
+                    elevation: 1.0,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    child: child,
+                  ),
+                  getPlaceDetailWithLatLng: (prediction) {
+                    if ((prediction.lat != null) && prediction.lng != null) {
+                      selectedLocation = Point(
+                        latitude: double.parse(prediction.lat!),
+                        longitude: double.parse(prediction.lng!),
+                      );
+                      setState(() {});
+                      mapController.moveCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(target: selectedLocation!),
+                        ),
+                      );
+                      tapedPace = selectedLocation!;
+                      isTapPlace = true;
+                    }
+                  },
+                  itmClick: (Prediction prediction) =>
+                      _textController.text = prediction.description!,
+                ),
+              ),
+            ),
           ),
           Align(
             alignment: const Alignment(1, -0.7),

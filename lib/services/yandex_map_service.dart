@@ -11,7 +11,7 @@ class YandexMapService {
         RequestPoint(point: from, requestPointType: RequestPointType.wayPoint),
         RequestPoint(point: to, requestPointType: RequestPointType.wayPoint),
       ],
-      drivingOptions: DrivingOptions(
+      drivingOptions: const DrivingOptions(
         initialAzimuth: 1,
         routesCount: 1,
         avoidTolls: true,

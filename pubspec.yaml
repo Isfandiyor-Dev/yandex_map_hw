@@ -14,7 +14,8 @@ dependencies:
   http: ^1.2.1
   location: ^7.0.0
   yandex_mapkit: ^4.1.0
-
+  google_maps_flutter: ^2.7.0
+  google_places_autocomplete_text_field: ^0.1.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
